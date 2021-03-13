@@ -36,13 +36,15 @@ class ConfigParser:
                 if isInterface:
                     self.content["Interface"][line.split("=", 1)[0].strip()] = line.split("=", 1)[1].strip()
                 elif isPeer:
-                    self.content["Peers"][peerNumber][line.split("=")[0].strip()] = line.split("=")[1].strip()
+                    self.content["Peers"][peerNumber][line.split("=")[0].strip()] = line.split("=", 1)[1].strip()
             else:
                 pass
+        if peerNumber == 0:
+            self.content["Peers"] = [0]
         self.content["Peers"][0] = peerNumber
-        print(self.content)
 
 
 if __name__ == "__main__":
     cfg = ConfigParser()
     cfg.read("test/test.conf")
+    print(cfg.content)
