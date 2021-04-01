@@ -1,0 +1,2 @@
+# put in /etc/sudoers.d/ and replace $user with the username of the user that will run this script
+$user ALL = NOPASSWD:/usr/bin/wg, /usr/bin/wg-quick

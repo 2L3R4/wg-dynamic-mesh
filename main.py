@@ -43,12 +43,12 @@ class Wireguard:
     def start(self):
         if self.isRunning:
             return
-        return os.system("wg-quick up ./" + self.configFile)
+        return os.system("sudo wg-quick up ./" + self.configFile)
 
     def stop(self):
         if not self.isRunning:
             return
-        return os.system("wg-quick down ./" + self.configFile)
+        return os.system("sudo wg-quick down ./" + self.configFile)
 
     def addPeer(self, publicKey: str, allowedIPs: list = None, peerName: str = None, endpoint: str = None):
         allowedIPs = [] if not allowedIPs else allowedIPs
@@ -102,16 +102,16 @@ def print_help():
 
 
 if __name__ == '__main__':
-    if os.getuid() != 0:
-        print("This script requires root or sudo privileges\n please rerun with sudo", file=sys.stderr)
-        exit(1)
-    if len(sys.argv) == 1:
-        print_help()
-    elif sys.argv[1] in ["help", "--help", "-h"]:
+    #if os.getuid() != 0:
+    #    print(sys.argv)
+    #    elevatedSelf = subprocess.run(["sudo", "python"] + sys.argv, stdout=sys.stdout, stderr=sys.stderr, stdin=sys.stdin)
+    #    #print("This script requires root or sudo privileges\n please rerun with sudo", file=sys.stderr)
+    #    exit(elevatedSelf.returncode)
+    if len(sys.argv) == 1 or sys.argv[1] in ["help", "--help", "-h"]:
         print_help()
     wg = Wireguard(sys.argv[1].split("/")[-1].split(".")[0], sys.argv[1],
                    mode=sys.argv[2] if len(sys.argv) >= 3 else "client")
-    # wg.start()
+    wg.start()
     wg._getPeerInfo()
     time.sleep(10)
     input(":")
