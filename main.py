@@ -40,32 +40,6 @@ class Wireguard:
 
             self.addPeer(pubkey, allowedIps, peerName, endpoint)
 
-    def start(self):
-        if self.isRunning:
-            return
-        self.isRunning = True
-        return os.system("sudo wg-quick up ./" + self.configFile)
-
-    def stop(self):
-        if not self.isRunning:
-            return
-        self.isRunning = False
-        return os.system("sudo wg-quick down ./" + self.configFile)
-
-    def addPeer(self, publicKey: str, allowedIPs: list = None, peerName: str = None, endpoint: str = None):
-        allowedIPs = [] if not allowedIPs else allowedIPs
-        if type(allowedIPs) is str:
-            allowedIPs = allowedIPs.split(",")
-        peerName = publicKey if not peerName else peerName
-        self.peers.append(self.Peer(publicKey, allowedIPs, peerName, endpoint))
-
-    def peerInfo(self):
-        peers = self._getPeerInfo()
-        outPeers = {}
-        for peer in peers:
-            outPeers[self._nameFromPubkey(peer)] = dict({"PublicKey": peer}, **peers[peer])
-        return outPeers
-
     def _getPeerInfo(self):
         peerInfoCommand = subprocess.run(f"sudo wg show {self.interfaceName} dump".split(" "), stdout=subprocess.PIPE)
         peers = {}
@@ -97,6 +71,32 @@ class Wireguard:
             if peer.publicKey == pubkey:
                 return peer.peerName
         return pubkey
+
+    def start(self):
+        if self.isRunning:
+            return
+        self.isRunning = True
+        return os.system("sudo wg-quick up ./" + self.configFile)
+
+    def stop(self):
+        if not self.isRunning:
+            return
+        self.isRunning = False
+        return os.system("sudo wg-quick down ./" + self.configFile)
+
+    def addPeer(self, publicKey: str, allowedIPs: list = None, peerName: str = None, endpoint: str = None):
+        allowedIPs = [] if not allowedIPs else allowedIPs
+        if type(allowedIPs) is str:
+            allowedIPs = allowedIPs.split(",")
+        peerName = publicKey if not peerName else peerName
+        self.peers.append(self.Peer(publicKey, allowedIPs, peerName, endpoint))
+
+    def peerInfo(self):
+        peers = self._getPeerInfo()
+        outPeers = {}
+        for peer in peers:
+            outPeers[self._nameFromPubkey(peer)] = dict({"PublicKey": peer}, **peers[peer])
+        return outPeers
 
 
 def print_help():
