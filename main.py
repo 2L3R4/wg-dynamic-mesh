@@ -43,11 +43,13 @@ class Wireguard:
     def start(self):
         if self.isRunning:
             return
+        self.isRunning = True
         return os.system("sudo wg-quick up ./" + self.configFile)
 
     def stop(self):
         if not self.isRunning:
             return
+        self.isRunning = False
         return os.system("sudo wg-quick down ./" + self.configFile)
 
     def addPeer(self, publicKey: str, allowedIPs: list = None, peerName: str = None, endpoint: str = None):
@@ -56,6 +58,13 @@ class Wireguard:
             allowedIPs = allowedIPs.split(",")
         peerName = publicKey if not peerName else peerName
         self.peers.append(self.Peer(publicKey, allowedIPs, peerName, endpoint))
+
+    def peerInfo(self):
+        peers = self._getPeerInfo()
+        outPeers = {}
+        for peer in peers:
+            outPeers[self._nameFromPubkey(peer)] = dict({"PublicKey": peer}, **peers[peer])
+        return outPeers
 
     def _getPeerInfo(self):
         peerInfoCommand = subprocess.run(f"sudo wg show {self.interfaceName} dump".split(" "), stdout=subprocess.PIPE)
@@ -74,7 +83,7 @@ class Wireguard:
                 }
             except ValueError:
                 pass
-        print(peers)
+        # print(peers)
         return peers
 
     def _pubkeyFromName(self, name):
@@ -102,7 +111,7 @@ def print_help():
 
 
 if __name__ == '__main__':
-    #if os.getuid() != 0:
+    # if os.getuid() != 0:
     #    print(sys.argv)
     #    elevatedSelf = subprocess.run(["sudo", "python"] + sys.argv, stdout=sys.stdout, stderr=sys.stderr, stdin=sys.stdin)
     #    #print("This script requires root or sudo privileges\n please rerun with sudo", file=sys.stderr)
@@ -112,7 +121,7 @@ if __name__ == '__main__':
     wg = Wireguard(sys.argv[1].split("/")[-1].split(".")[0], sys.argv[1],
                    mode=sys.argv[2] if len(sys.argv) >= 3 else "client")
     wg.start()
-    wg._getPeerInfo()
+    print(wg._getPeerInfo())
     time.sleep(10)
     input(":")
     # wg.stop()
