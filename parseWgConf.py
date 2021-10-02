@@ -10,7 +10,7 @@ class ConfigParser:
             lines = f.readlines()
         isInterface = False
         isPeer = False
-        peerNumber = 0
+        peerNumber = -1
         print(lines)
         for line in lines:
             # line = line.decode('utf-8')
@@ -23,8 +23,10 @@ class ConfigParser:
             elif line == '[Peer]':
                 isPeer = True
                 isInterface = False
-                self.content["Peers"] = [{}] if peerNumber == 0 else self.content["Peers"]
-                self.content["Peers"].append({})
+                if peerNumber == -1:
+                    self.content["Peers"] = [{}] 
+                else:
+                    self.content["Peers"].append({})
                 peerNumber += 1
             elif line.startswith("#Name"):
                 if isInterface:

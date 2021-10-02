@@ -5,6 +5,7 @@ import os
 import subprocess
 import sys
 import time
+import pywireguard
 
 from parseWgConf import ConfigParser
 
@@ -26,15 +27,15 @@ class Wireguard:
         self.configFile = configFile
         self.config = ConfigParser()
         self.config.read(configFile)
-        for i in range(self.config.content['Peers'][0]):
-            pubkey = self.config.content['Peers'][i + 1]['PublicKey']
-            allowedIps = self.config.content['Peers'][i + 1]['AllowedIPs']
+        for i in range(len(self.config.content['Peers'])):
+            pubkey = self.config.content['Peers'][i]['PublicKey']
+            allowedIps = self.config.content['Peers'][i]['AllowedIPs']
             try:
-                peerName = self.config.content['Peers'][i + 1]['Name']
+                peerName = self.config.content['Peers'][i]['Name']
             except KeyError:
                 peerName = None
             try:
-                endpoint = self.config.content['Peers'][i + 1]['Endpoint']
+                endpoint = self.config.content['Peers'][i]['Endpoint']
             except KeyError:
                 endpoint = None
 
@@ -43,12 +44,12 @@ class Wireguard:
     def start(self):
         if self.isRunning:
             return
-        return os.system("wg-quick up ./" + self.configFile)
+        return os.system("sudo wg-quick up ./" + self.configFile)
 
     def stop(self):
         if not self.isRunning:
             return
-        return os.system("wg-quick down ./" + self.configFile)
+        return os.system("sudo wg-quick down ./" + self.configFile)
 
     def addPeer(self, publicKey: str, allowedIPs: list = None, peerName: str = None, endpoint: str = None):
         allowedIPs = [] if not allowedIPs else allowedIPs
@@ -104,7 +105,7 @@ def print_help():
 if __name__ == '__main__':
     if os.getuid() != 0:
         print("This script requires root or sudo privileges\n please rerun with sudo", file=sys.stderr)
-        exit(1)
+        #exit(1)
     if len(sys.argv) == 1:
         print_help()
     elif sys.argv[1] in ["help", "--help", "-h"]:
