@@ -11,11 +11,11 @@ class ConfigParser:
         isInterface = False
         isPeer = False
         peerNumber = -1
-        print(lines)
+        #print(lines)
         for line in lines:
             # line = line.decode('utf-8')
             line = line.strip()
-            print(line)
+            #print(line)
             # print("isInterface " + str(isInterface)+ "; IsPeer" + str(isPeer))
             if line == '[Interface]':
                 isInterface = True
@@ -34,7 +34,7 @@ class ConfigParser:
                 elif isPeer:
                     self.content["Peers"][peerNumber]["Name"] = line.split("=")[1].strip()
             elif not line.startswith('#') and not line == '':
-                print(line.split("="))
+                #print(line.split("="))
                 if isInterface:
                     self.content["Interface"][line.split("=", 1)[0].strip()] = line.split("=", 1)[1].strip()
                 elif isPeer:
@@ -43,7 +43,7 @@ class ConfigParser:
                 pass
         if peerNumber == 0:
             self.content["Peers"] = [0]
-        self.content["Peers"][0] = peerNumber
+        #self.content["Peers"][0] = peerNumber
 
 
 if __name__ == "__main__":

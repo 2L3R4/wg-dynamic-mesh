@@ -27,15 +27,15 @@ class Wireguard:
         self.configFile = configFile
         self.config = ConfigParser()
         self.config.read(configFile)
-        for i in range(len(self.config.content['Peers'])):
-            pubkey = self.config.content['Peers'][i]['PublicKey']
-            allowedIps = self.config.content['Peers'][i]['AllowedIPs']
+        for peer in self.config.content['Peers'][1:]:
+            pubkey = peer['PublicKey']
+            allowedIps = peer['AllowedIPs']
             try:
-                peerName = self.config.content['Peers'][i]['Name']
+                peerName = peer['Name']
             except KeyError:
                 peerName = None
             try:
-                endpoint = self.config.content['Peers'][i]['Endpoint']
+                endpoint = peer['Endpoint']
             except KeyError:
                 endpoint = None
 
